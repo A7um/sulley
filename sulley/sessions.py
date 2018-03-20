@@ -444,20 +444,6 @@ class session (pgraph.graph):
                     # attempt to complete a fuzz transmission. keep trying until we are successful, whenever a failure
                     # occurs, restart the target.
                     while 1:
-                        # instruct the debugger/sniffer that we are about to send a new fuzz.
-                        if target.procmon:
-                            try:
-                                target.procmon.pre_send(self.total_mutant_index)
-                            except Exception, e:
-                                error_handler(e, "failed on procmon.pre_send()", target)
-                                continue
-
-                        if target.netmon:
-                            try:
-                                target.netmon.pre_send(self.total_mutant_index)
-                            except Exception, e:
-                                error_handler(e, "failed on netmon.pre_send()", target)
-                                continue
 
                         try:
                             # establish a connection to the target.
@@ -490,6 +476,20 @@ class session (pgraph.graph):
                                 sock = httplib.FakeSocket(sock, ssl)
                             except Exception, e:
                                 error_handler(e, "failed ssl setup", target, sock)
+                                continue
+			# instruct the debugger/sniffer that we are about to send a new fuzz.
+                        if target.procmon:
+                            try:
+                                target.procmon.pre_send(self.total_mutant_index)
+                            except Exception, e:
+                                error_handler(e, "failed on procmon.pre_send()", target)
+                                continue
+
+                        if target.netmon:
+                            try:
+                                target.netmon.pre_send(self.total_mutant_index)
+                            except Exception, e:
+                                error_handler(e, "failed on netmon.pre_send()", target)
                                 continue
 
                         # if the user registered a pre-send function, pass it the sock and let it do the deed.
@@ -703,7 +703,7 @@ class session (pgraph.graph):
 
             # start the target back up.
             # If it returns False, stop the test
-            if self.restart_target(target, stop_first=False) == False:
+            if self.restart_target(target, stop_first=True) == False:
                 self.logger.critical("Restarting the target failed, exiting.")
                 self.export_file()
                 try:
