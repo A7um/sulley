@@ -49,6 +49,9 @@ class DebuggerThread (threading.Thread):
         # set the user callback which is response for checking if this thread has been killed.
         self.dbg.set_callback(pydbg.defines.USER_CALLBACK_DEBUG_EVENT, self.dbg_callback_user)
         self.dbg.set_callback(pydbg.defines.EXCEPTION_ACCESS_VIOLATION, self.dbg_callback_access_violation)
+        #we also have to deal with EXECPTION_SECURITY_CHECK_FAILURE
+        EXECPTION_SECURITY_CHECK_FAILURE=0xC0000409
+        self.dbg.set_callback(EXECPTION_SECURITY_CHECK_FAILURE, self.dbg_callback_access_violation)
 
     def dbg_callback_access_violation (self, dbg):
         """
